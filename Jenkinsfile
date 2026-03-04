@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        dockerContainer {
-            image 'python:3.12-slim'
-        }
-    }
+    agent any
 
     environment {
         PYTHONUNBUFFERED = '1'
@@ -17,11 +13,20 @@ pipeline {
             }
         }
 
+        stage('Setup Python') {
+            steps {
+                echo 'Setting up Python environment...'
+                sh '''
+                    apt-get update && apt-get install -y python3 python3-pip
+                '''
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Python dependencies...'
-                sh 'pip install --upgrade pip'
-                sh 'pip install -r requirements.txt'
+                sh 'pip3 install --upgrade pip'
+                sh 'pip3 install -r requirements.txt'
             }
         }
 
