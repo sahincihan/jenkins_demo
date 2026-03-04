@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        dockerContainer {
-            image 'python:3.12-slim'
-        }
-    }
+    agent any
 
     environment {
         PYTHONUNBUFFERED = '1'
@@ -20,15 +16,22 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Python dependencies...'
-                sh 'pip install --upgrade pip'
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    if ! command -v python3 &> /dev/null; then
+                        apt-get update && apt-get install -y python3 python3-pip || \
+                        yum install -y python3 python3-pip || \
+                        apk add --no-cache python3 py3-pip
+                    fi
+                    python3 -m pip install --upgrade pip --user
+                    python3 -m pip install -r requirements.txt --user
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh 'pytest -v --tb=short test_app.py'
+                sh 'python3 -m pytest -v --tb=short test_app.py'
             }
         }
 
