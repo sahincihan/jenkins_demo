@@ -17,11 +17,6 @@ pipeline {
             steps {
                 echo 'Installing Python dependencies...'
                 sh '''
-                    if ! command -v python3 &> /dev/null; then
-                        apt-get update && apt-get install -y python3 python3-pip || \
-                        yum install -y python3 python3-pip || \
-                        apk add --no-cache python3 py3-pip
-                    fi
                     python3 -m pip install --upgrade pip --user
                     python3 -m pip install -r requirements.txt --user
                 '''
